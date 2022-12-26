@@ -9,7 +9,7 @@ void main()
     int Resource_allocated[5][3]={ {0, 1, 0 }, { 2, 0, 0 },{ 3, 0, 2 },{ 2, 1, 1 },{ 0, 0, 2 } },
     Resource_Max[5][3]={ { 7, 5, 3 },{ 3, 2, 2 },{ 9, 0, 2 },{ 2, 2, 2 },{ 4, 3, 3 } },
     total_resources[3]={10,5,7},allocated_total[3]={0,0,0},Resource_available[r],
-    Resource_needed[n][r],f[n],flag,completed=n;
+    Resource_needed[n][r],f[n],flag,remaining=n,completed=0;
     for(i=0;i<n;i++)
     {
         f[i]=0;
@@ -43,14 +43,17 @@ void main()
                     Resource_available[j]+=Resource_allocated[i][j];
                 }
                 f[i]=1;
-                completed--;
-                if(completed>0)
+                remaining--;
+                completed++;
+                if(remaining>0)
                 printf("P%d -> ",i);
                 else
                 printf("P%d\n",i);
             }
         }
-        if(completed>0 && i==n-1)
+        if(remaining>0 && i==n-1)
         i=-1;
+        if(completed==n)
+        break;
     }
 }
