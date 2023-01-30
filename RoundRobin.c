@@ -1,63 +1,79 @@
 #include<stdio.h>
 void main()
 {
-    int n,i,j,y,tq,time=0,k,x,z;
+    int n,i,j,y,tq,time=0,k,x,z,l;
     float avg_tat=0,avg_wt=0;
     printf("Number of Process = ");
     scanf("%d",&n);
     k=n;
-    int at[2*n],bt[2*n],et[2*n],wt[2*n],tat[2*n],temp1[2*n],temp2[2*n],a[2*n],count=n;
+    int at[2*n],bt[n],et[n],wt[n],tat[n],temp1[n],temp2[n],count=n,PID[n],queue[2*n];
     for(i=0;i<n;i++)
     {
-        a[i]=i;
+        PID[i]=i;
+        queue[i]=i;
         printf("\nArrival time of process %d = ",i+1);
         scanf("%d",&at[i]);
         temp1[i]=at[i];
+
+
         printf("Burst time of process %d = ",i+1);
         scanf("%d",&bt[i]);
         temp2[i]=bt[i];
     }
     printf("\nTime Quantum = ");
     scanf("%d",&tq);
+    for(i=0;i<n-1;i++)
+    {
+        for(j=0;j<n-i;j++)
+        {
+            if(at[j]>at[j+1])
+            {
+                z=queue[j];
+                queue[j]=queue[j+1];
+                queue[j+1]=z;
+                
+                z=PID[j];
+                PID[j]=PID[j+1];
+                PID[j+1]=z;
+                
+                z=at[j];
+                at[j]=at[j+1];
+                at[j+1]=z;
+            }
+        }
+    }
     while(count>0)
     {
         for(i=0;i<n;i++)
         {
-            if(at[i]<=time && bt[i]<=tq)
+            l=queue[i];
+            if(temp1[l]<=time && bt[l]<=tq)
             {
-                time+=bt[i];
+                time+=bt[l];
                 count--;
-                x=a[i];
-                et[x]=time;
-                bt[i]=0;
+                et[l]=time;
+                bt[l]=0;
             }
-            else if(at[i]<=time && bt[i]>tq)
+            else if(temp1[l]<=time && bt[l]>tq)
             {
                 time+=tq;
-                bt[i]-=tq;
-                z=i;
+                bt[l]-=tq;
                for(y=0;y<n;y++)
                {
-                if(at[y]>time)
+                if(temp1[queue[y]]>time)
                 {
                     x=y;
-                    for(j=n;j>n-x+1;j--)
+                    for(j=n;j>x;j--)
                     {
-                        at[j]=at[j-1];
-                        a[j]=a[j-1];
-                        bt[j]=bt[j-1];
+                        queue[j]=queue[j-1];
                     }
-                    at[x]=at[z];
-                    a[x]=a[z];
-                    bt[x]=bt[z];
+                    queue[x]=l;
                     n++;
                     break;
                 }
                 else if(y==n-1)
                 {
-                    at[y+1]=at[z];
-                    a[y+1]=a[z];
-                    bt[y+1]=bt[z];
+                    queue[y+1]=l;
                     n++;
                     break;
                 }
@@ -69,12 +85,12 @@ void main()
     printf("\nProcess No.  Arrival Time  Burst Time  Turn-around Time  Waiting Time\n");
     for (j=0; j<k; j++)
     {
-        tat[j] = et[j] - temp1[j];
-        wt[j] = et[j] - temp1[j]- temp2[j];
-        printf("   %d\t\t %d\t\t %d\t\t%d\t\t%d\n",j+1,temp1[j],temp2[j],tat[j],wt[j]);
+        tat[PID[j]] = et[PID[j]] - at[j];
+        wt[PID[j]] = et[PID[j]] - at[j]- temp2[PID[j]];
     }
     for(j=0;j<k;j++)
     {
+        printf("   %d\t\t %d\t\t %d\t\t%d\t\t%d\n",j+1,temp1[j],temp2[j],tat[j],wt[j]);
         avg_tat+=tat[j];
         avg_wt+=wt[j];
     }
